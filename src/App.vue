@@ -12,6 +12,7 @@
 
 <script>
 import MkTable from './components/MkTable'
+import Moment from 'moment';
 
 export default {
   name: 'App',
@@ -33,7 +34,8 @@ export default {
                   {
                       type: 'slot',
                       name: 'name',
-                      title: 'name'
+                      title: 'name',
+                      sort: true
                   },
                   {
                       name: 'birthday',
@@ -44,8 +46,9 @@ export default {
                       name: 'age',
                       title: 'age',
                       callback (item) {
-                          return 'callback works ' + item.birthday;
-                      }
+                          return Moment(item.birthday, 'YYYY-MM-DD').fromNow(true);
+                      },
+                      sort: true
                   }
               ]
           }
