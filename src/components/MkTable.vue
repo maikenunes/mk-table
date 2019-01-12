@@ -1,12 +1,15 @@
 <template>
-  <div class="table-responsive">
+  <section class="table-responsive">
+    <div v-if="isSearchEnabled()">
+        <input class="mb-3" placeholder="Search" v-on:keyup="searchData"/>
+    </div>
     <table class="table table-striped table-sm">
       <thead>
         <tr>
           <th v-for="(field, key) in fields"
             v-bind:key="key"
             v-on:click="setSortField(field)">
-            <span :class="{'font-italic': isFieldSortable(field)}" v-html="field.title"></span>
+            <span :class="{'font-italic': isFieldSortable(field)}" v-text="field.title"></span>
             <template v-if="isFieldSortable(field) && isFieldSortEnabled(field)">
               <img v-if="isFieldSortAsc()" src="./../assets/chevron-bottom.png"/>
               <img v-else src="./../assets/chevron-top.png"/>
@@ -26,10 +29,10 @@
               </slot>
             </template>
             <template v-else-if="isFieldCallback(field)">
-              <span v-html="field.callback(item)"></span>
+              <span v-text="field.callback(item)"></span>
             </template>
             <template v-else>
-              <span v-html="item[field.name]"></span>
+              <span v-text="item[field.name]"></span>
             </template>
           </td>
         </tr>
@@ -38,7 +41,7 @@
 
       </tfoot>
     </table>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -47,11 +50,15 @@ export default {
   props: {
       fields: {
           type: Array,
-          default: () => []
+          required: true
       },
       items: {
           type: Array,
           default: () => []
+      },
+      search: {
+          type: Object,
+          default: () => {}
       }
   },
   data () {
@@ -83,6 +90,9 @@ export default {
       },
       isFieldSortAsc () {
           return (this.sort.order || null) === 'asc';
+      },
+      isSearchEnabled () {
+          return this.search && this.search.enabled;
       },
       setSortField (field) {
           if (!this.isFieldSortable(field)) {
@@ -147,6 +157,19 @@ export default {
       },
       getSortField () {
           return this.sort.field || {};
+      },
+      searchData (keyEvent) {
+          let search = keyEvent.srcElement.value;
+          if (search == '') {
+              this.tableData = this.originalData;
+              return;
+          }
+
+          this.tableData = this.originalData.filter((register) => {
+              return Object.values(register).some((item) => {
+                  return item.toUpperCase().search(search.toUpperCase()) >= 0;
+              });
+          });
       }
   },
   watch: {

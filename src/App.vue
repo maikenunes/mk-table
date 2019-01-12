@@ -22,6 +22,7 @@ export default {
   methods: {
       getTableProps () {
           return {
+              search: {enabled: true},
               items: [
                   {name: 'Maike', birthday: '1993-01-06'},
                   {name: 'Souza', birthday: '1992-01-06'},
